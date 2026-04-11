@@ -1,7 +1,6 @@
 {
   "name": "quiz_eiken",
   "version": "1.0.0",
-  "type": "module",
   "main": "level.js",
   "scripts": {
     "start": "node server.js"
