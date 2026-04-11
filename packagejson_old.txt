@@ -1,0 +1,16 @@
+package.json
+{
+  "name": "quiz_eiken",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "level.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "pg": "^8.20.0"
+  }
+}
