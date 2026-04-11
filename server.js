@@ -14,7 +14,8 @@ const client = new Client({
 client.connect();
 
 // GitHub Pages の画像ベースURL
-const IMAGE_BASE_URL = "https://github.com/argosdidit/EikenDB/tree/main/level/section/year_times/reading";
+let IMAGE_BASE_URL;
+IMAGE_BASE_URL = "https://github.com/argosdidit/EikenDB/blob/main/level/section/year_times/reading/";
 
 // 文章データ（sentence）の prefix 付与
 function addSentencePrefix(row) {
