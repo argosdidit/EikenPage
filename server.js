@@ -14,28 +14,53 @@ const client = new Client({
 client.connect();
 
 // GitHub Pages の画像ベースURL
-let IMAGE_BASE_URL;
-IMAGE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
+let READING_IMAGE_BASE_URL;
+READING_IMAGE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
+
+let LISTENING_IMAGE_BASE_URL;
+LISTENING_IMAGE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/listening/";
 
 
 // 文章データ（sentence）の prefix 付与
-function addSentencePrefix(row) {
+function addReadingSentencePrefix(row) {
   return {
     ...row,
-    path_sentence: IMAGE_BASE_URL + row.path_sentence,
-    path_explanation: IMAGE_BASE_URL + row.path_explanation
+    path_sentence: READING_IMAGE_BASE_URL + row.path_sentence,
+    path_explanation: READING_IMAGE_BASE_URL + row.path_explanation
   };
 }
 
 // 選択肢データ（choice）の prefix 付与
-function addChoicePrefix(row) {
+function addReadingChoicePrefix(row) {
   return {
     ...row,
-    path_question: IMAGE_BASE_URL + row.path_question,
-    path_choice1: IMAGE_BASE_URL + row.path_choice1,
-    path_choice2: IMAGE_BASE_URL + row.path_choice2,
-    path_choice3: IMAGE_BASE_URL + row.path_choice3,
-    path_choice4: IMAGE_BASE_URL + row.path_choice4
+    path_question: READING_IMAGE_BASE_URL + row.path_question,
+    path_choice1: READING_IMAGE_BASE_URL + row.path_choice1,
+    path_choice2: READING_IMAGE_BASE_URL + row.path_choice2,
+    path_choice3: READING_IMAGE_BASE_URL + row.path_choice3,
+    path_choice4: READING_IMAGE_BASE_URL + row.path_choice4
+  };
+}
+
+// 文章データ（sentence）の prefix 付与
+function addListeningAudioPrefix(row) {
+  return {
+    ...row,
+    path_sentence: LISTENING_AUDIO_BASE_URL + row.path_audio
+  };
+}
+
+// 選択肢データ（choice）の prefix 付与
+function addListeningChoicePrefix(row) {
+  return {
+    ...row,
+    path_question: LISTENING_IMAGE_BASE_URL + row.path_question,
+    path_choice0: LISTENING_IMAGE_BASE_URL + row.path_choice0,
+    path_choice1: LISTENING_IMAGE_BASE_URL + row.path_choice1,
+    path_choice2: LISTENING_IMAGE_BASE_URL + row.path_choice2,
+    path_choice3: LISTENING_IMAGE_BASE_URL + row.path_choice3,
+    path_choice4: LISTENING_IMAGE_BASE_URL + row.path_choice4,
+    path_choice5: LISTENING_IMAGE_BASE_URL + row.path_choice5,
   };
 }
 
@@ -153,8 +178,8 @@ app.get("/api/reading", async (req, res) => {
     );
 
     // ★ ここで prefix を付ける
-    const sentenceWithPrefix = sentenceResult.rows.map(addSentencePrefix);
-    const choiceWithPrefix = choiceResult.rows.map(addChoicePrefix);
+    const sentenceWithPrefix = sentenceResult.rows.map(addReadingSentencePrefix);
+    const choiceWithPrefix = choiceResult.rows.map(addReadingChoicePrefix);
 
     res.json({
       sentence: sentenceWithPrefix,
@@ -163,6 +188,104 @@ app.get("/api/reading", async (req, res) => {
 
   } catch (err) {
     console.error("reading error:", err);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// -----------------------------
+// /api/listening エンドポイント
+// -----------------------------
+app.get("/api/listening", async (req, res) => {
+  const { level, year, times } = req.query;
+
+  // レベル → テーブル名のマッピング
+  const tableAudio = {
+    pre2: "LISTENING_AUIDO_PRE2",
+    grade2: "LISTENING_AUDIO_2",
+    pre1: "LISTENING_AUDIO_PRE1",
+    grade1: "LISTENING_AUDIO_1"
+  };
+
+  const tableChoice = {
+    pre2: "LISTENING_CHOICE_PRE2",
+    grade2: "LISTENING_CHOICE_2",
+    pre1: "LISTENING_CHOICE_PRE1",
+    grade1: "LISTENING_CHOICE_1"
+  };
+
+  const audioTable = tableAudio[level];
+  const choiceTable = tableChoice[level];
+
+  if (!audioTable || !choiceTable) {
+    return res.status(400).json({ error: "Invalid level" });
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+
+    // 文章データ
+    const [audioRows] = await connection.execute(
+      `
+      SELECT
+      LEVELID,
+      YEAR,
+      TIMES,
+      AREA,
+      PATH_AUDIO
+      FROM ${audioTable}
+      WHERE
+      YEAR = ?
+      AND
+      TIMES = ?
+      `,
+      [year, times]
+    );
+
+    // 設問データ
+    const [choiceRows] = await connection.execute(
+      `
+      SELECT
+      LEVELID,
+      YEAR,
+      TIMES,
+      AREA,
+      NO,
+      PATH_CHOICE1,
+      PATH_CHOICE2,
+      PATH_CHOICE3,
+      PATH_CHOICE4,
+      PATH_SUBTITLE,
+      PATH_EXPLANATION,
+      TIME_SEC_START,
+      TIME_SEC_END,
+      ANSWER
+      FROM ${choiceTable}
+      WHERE
+      YEAR = ?
+      AND
+      TIMES = ?
+      `,
+      [year, times]
+    );
+
+    await connection.end();
+
+    res.json({
+      audio: audioRows,
+      choice: choiceRows
+    });
+
+    // ★ ここで prefix を付ける
+    const audioWithPrefix = audioResult.rows.map(addListeningAudioPrefix);
+    const choiceWithPrefix = choiceResult.rows.map(addListeningChoicePrefix);
+
+    res.json({
+      audio: audioWithPrefix,
+      choice: choiceWithPrefix
+    });
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "DB error" });
   }
 });
