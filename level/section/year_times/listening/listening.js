@@ -62,25 +62,25 @@ const ListeningApp = (() => {
         areaBox.className = "main-question";
 
         areaBox.innerHTML = `
-          <div class="area-label">[${audio.AREA}]</div>
+          <div class="area-label">[${audio.area}]</div>
           <div class="main-header">
-            <audio controls src="${audio.PATH_AUDIO}">
+            <audio controls src="${audio.path_audio}">
           </div>
         `;
 
-        const questions = choiceList.filter(q => q.AREA === audio.AREA);
+        const questions = choiceList.filter(q => q.area === audio.area);
 
         questions.forEach(q => {
           const quizBox = document.createElement("div");
           quizBox.className = "quiz-box";
-          quizBox.dataset.no = q.NO;
+          quizBox.dataset.no = q.no;
 
           quizBox.innerHTML = `
             <div class="quiz-header-row">
-            <div class="no-label">Q${q.NO}</div>
+            <div class="no-label">Q${q.no}</div>
             <div class="quiz-header-buttons">
-            <button class="play-btn" data-start="${q.TIME_SEC_START}" data-end="${q.TIME_SEC_END}">再生</button>
-            <button class="subtitle-btn" data-sub="${q.PATH_SUBTITLE}">字幕</button>
+            <button class="play-btn" data-start="${q.time_sec_start}" data-end="${q.time_sec_end}">再生</button>
+            <button class="subtitle-btn" data-sub="${q.path_subtitle}">字幕</button>
             </div>
             </div>
 
@@ -93,7 +93,7 @@ const ListeningApp = (() => {
               `).join("")}
             </div>
             <div class="quiz-footer-row">
-            <img src="${q.PATH_SUBTITLE}">
+            <img src="${q.path_subtitle}">
             </div>
           `;
 
@@ -152,7 +152,7 @@ const ListeningApp = (() => {
         document.querySelectorAll(".quiz-box").forEach(box => {
           const no = Number(box.dataset.no);
           const q = choiceList.find(item => item.NO === no);
-          const correct = q.ANSWER;
+          const correct = q.answer;
           
           const selectedRow = box.querySelector(".choice-row.selected");
           const correctRow = box.querySelector(`.choice-row:nth-child(${correct})`);
