@@ -54,13 +54,13 @@ function addListeningAudioPrefix(row) {
 function addListeningChoicePrefix(row) {
   return {
     ...row,
-    path_question: LISTENING_IMAGE_BASE_URL + row.path_question,
-    path_choice0: LISTENING_IMAGE_BASE_URL + row.path_choice0,
     path_choice1: LISTENING_IMAGE_BASE_URL + row.path_choice1,
     path_choice2: LISTENING_IMAGE_BASE_URL + row.path_choice2,
     path_choice3: LISTENING_IMAGE_BASE_URL + row.path_choice3,
     path_choice4: LISTENING_IMAGE_BASE_URL + row.path_choice4,
     path_choice5: LISTENING_IMAGE_BASE_URL + row.path_choice5,
+    path_subtitle: READING_IMAGE_BASE_URL + row.path_subtitle,
+    path_explanation: READING_IMAGE_BASE_URL + row.path_explanation
   };
 }
 
