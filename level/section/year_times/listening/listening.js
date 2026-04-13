@@ -88,7 +88,7 @@ const ListeningApp = (() => {
               ${[1,2,3,4].map(n => `
                 <div class="choice-row">
                   <span class="choice-number">${n}.</span>
-                  <img src="${q[`PATH_CHOICE${n}`]}" class="choice" data-value="${n}">
+                  <img src="${q[`path_choice${n}`]}" class="choice" data-value="${n}">
                 </div>
               `).join("")}
             </div>
@@ -151,7 +151,7 @@ const ListeningApp = (() => {
         
         document.querySelectorAll(".quiz-box").forEach(box => {
           const no = Number(box.dataset.no);
-          const q = choiceList.find(item => item.NO === no);
+          const q = choiceList.find(item => item.no === no);
           const correct = q.answer;
           
           const selectedRow = box.querySelector(".choice-row.selected");
