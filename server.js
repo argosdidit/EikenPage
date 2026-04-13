@@ -14,19 +14,19 @@ const client = new Client({
 client.connect();
 
 // GitHub Pages の画像ベースURL
-let READING_IMAGE_BASE_URL;
-READING_IMAGE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
+let READING_SOURCE_BASE_URL;
+READING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
 
-let LISTENING_IMAGE_BASE_URL;
-LISTENING_IMAGE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/listening/";
+let LISTENING_SOURCE_BASE_URL;
+LISTENING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/listening/";
 
 
 // 文章データ（sentence）の prefix 付与
 function addReadingSentencePrefix(row) {
   return {
     ...row,
-    path_sentence: READING_IMAGE_BASE_URL + row.path_sentence,
-    path_explanation: READING_IMAGE_BASE_URL + row.path_explanation
+    path_sentence: READING_SOURCE_BASE_URL + row.path_sentence,
+    path_explanation: READING_SOURCE_BASE_URL + row.path_explanation
   };
 }
 
@@ -34,19 +34,19 @@ function addReadingSentencePrefix(row) {
 function addReadingChoicePrefix(row) {
   return {
     ...row,
-    path_question: READING_IMAGE_BASE_URL + row.path_question,
-    path_choice1: READING_IMAGE_BASE_URL + row.path_choice1,
-    path_choice2: READING_IMAGE_BASE_URL + row.path_choice2,
-    path_choice3: READING_IMAGE_BASE_URL + row.path_choice3,
-    path_choice4: READING_IMAGE_BASE_URL + row.path_choice4
+    path_question: READING_SOURCE_BASE_URL + row.path_question,
+    path_choice1: READING_SOURCE_BASE_URL + row.path_choice1,
+    path_choice2: READING_SOURCE_BASE_URL + row.path_choice2,
+    path_choice3: READING_SOURCE_BASE_URL + row.path_choice3,
+    path_choice4: READING_SOURCE_BASE_URL + row.path_choice4
   };
 }
 
-// 文章データ（sentence）の prefix 付与
+// リスニングデータ（audio）の prefix 付与
 function addListeningAudioPrefix(row) {
   return {
     ...row,
-    path_sentence: LISTENING_AUDIO_BASE_URL + row.path_audio
+    path_audio: LISTENING_SOURCE_BASE_URL + row.path_audio
   };
 }
 
@@ -54,13 +54,12 @@ function addListeningAudioPrefix(row) {
 function addListeningChoicePrefix(row) {
   return {
     ...row,
-    path_choice1: LISTENING_IMAGE_BASE_URL + row.path_choice1,
-    path_choice2: LISTENING_IMAGE_BASE_URL + row.path_choice2,
-    path_choice3: LISTENING_IMAGE_BASE_URL + row.path_choice3,
-    path_choice4: LISTENING_IMAGE_BASE_URL + row.path_choice4,
-    path_choice5: LISTENING_IMAGE_BASE_URL + row.path_choice5,
-    path_subtitle: READING_IMAGE_BASE_URL + row.path_subtitle,
-    path_explanation: READING_IMAGE_BASE_URL + row.path_explanation
+    path_choice1: LISTENING_SOURCE_BASE_URL + row.path_choice1,
+    path_choice2: LISTENING_SOURCE_BASE_URL + row.path_choice2,
+    path_choice3: LISTENING_SOURCE_BASE_URL + row.path_choice3,
+    path_choice4: LISTENING_SOURCE_BASE_URL + row.path_choice4,
+    path_subtitle: LISTENING_SOURCE_BASE_URL + row.path_subtitle,
+    path_explanation: LISTENING_SOURCE_BASE_URL + row.path_explanation
   };
 }
 
@@ -193,24 +192,24 @@ app.get("/api/reading", async (req, res) => {
 });
 
 // -----------------------------
-// /api/listening エンドポイント
+// /api/listening エンドポイント（PostgreSQL版）
 // -----------------------------
 app.get("/api/listening", async (req, res) => {
   const { level, year, times } = req.query;
 
   // レベル → テーブル名のマッピング
   const tableAudio = {
-    pre2: "LISTENING_AUIDO_PRE2",
-    grade2: "LISTENING_AUDIO_2",
-    pre1: "LISTENING_AUDIO_PRE1",
-    grade1: "LISTENING_AUDIO_1"
+    pre2: "listening_audio_pre2",
+    grade2: "listening_audio_2",
+    pre1: "listening_audio_pre1",
+    grade1: "listening_audio_1"
   };
 
   const tableChoice = {
-    pre2: "LISTENING_CHOICE_PRE2",
-    grade2: "LISTENING_CHOICE_2",
-    pre1: "LISTENING_CHOICE_PRE1",
-    grade1: "LISTENING_CHOICE_1"
+    pre2: "listening_choice_pre2",
+    grade2: "listening_choice_2",
+    pre1: "listening_choice_pre1",
+    grade1: "listening_choice_1"
   };
 
   const audioTable = tableAudio[level];
@@ -221,61 +220,46 @@ app.get("/api/listening", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
-
-    // 文章データ
-    const [audioRows] = await connection.execute(
+    // 音声データ
+    const audioResult = await client.query(
       `
       SELECT
-      levelid,
-      year,
-      times,
-      area,
-      path_audio
+        levelid,
+        year,
+        times,
+        area,
+        path_audio
       FROM ${audioTable}
-      WHERE
-      year = ?
-      AND
-      times = ?
+      WHERE year = $1 AND times = $2
       `,
       [year, times]
     );
 
     // 設問データ
-    const [choiceRows] = await connection.execute(
+    const choiceResult = await client.query(
       `
       SELECT
-      levelid,
-      year,
-      times,
-      area,
-      no,
-      path_choice1,
-      path_choice2,
-      path_choice3,
-      path_choice4,
-      path_subtitle,
-      PATH_EXPLANATION,
-      time_sec_start,
-      time_sec_end,
-      answer
+        levelid,
+        year,
+        times,
+        area,
+        no,
+        path_choice1,
+        path_choice2,
+        path_choice3,
+        path_choice4,
+        path_subtitle,
+        path_explanation,
+        time_sec_start,
+        time_sec_end,
+        answer
       FROM ${choiceTable}
-      WHERE
-      year = ?
-      AND
-      times = ?
+      WHERE year = $1 AND times = $2
       `,
       [year, times]
     );
 
-    await connection.end();
-
-    res.json({
-      audio: audioRows,
-      choice: choiceRows
-    });
-
-    // ★ ここで prefix を付ける
+    // prefix 付与
     const audioWithPrefix = audioResult.rows.map(addListeningAudioPrefix);
     const choiceWithPrefix = choiceResult.rows.map(addListeningChoicePrefix);
 
@@ -285,11 +269,10 @@ app.get("/api/listening", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("listening error:", err);
     res.status(500).json({ error: "DB error" });
   }
 });
-
 
 // -----------------------------
 // サーバー起動
