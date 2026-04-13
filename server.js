@@ -227,16 +227,16 @@ app.get("/api/listening", async (req, res) => {
     const [audioRows] = await connection.execute(
       `
       SELECT
-      LEVELID,
-      YEAR,
-      TIMES,
-      AREA,
-      PATH_AUDIO
+      levelid,
+      year,
+      times,
+      area,
+      path_audio
       FROM ${audioTable}
       WHERE
-      YEAR = ?
+      year = ?
       AND
-      TIMES = ?
+      times = ?
       `,
       [year, times]
     );
@@ -245,25 +245,25 @@ app.get("/api/listening", async (req, res) => {
     const [choiceRows] = await connection.execute(
       `
       SELECT
-      LEVELID,
-      YEAR,
-      TIMES,
-      AREA,
-      NO,
-      PATH_CHOICE1,
-      PATH_CHOICE2,
-      PATH_CHOICE3,
-      PATH_CHOICE4,
-      PATH_SUBTITLE,
+      levelid,
+      year,
+      times,
+      area,
+      no,
+      path_choice1,
+      path_choice2,
+      path_choice3,
+      path_choice4,
+      path_subtitle,
       PATH_EXPLANATION,
-      TIME_SEC_START,
-      TIME_SEC_END,
-      ANSWER
+      time_sec_start,
+      time_sec_end,
+      answer
       FROM ${choiceTable}
       WHERE
-      YEAR = ?
+      year = ?
       AND
-      TIMES = ?
+      times = ?
       `,
       [year, times]
     );
