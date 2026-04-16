@@ -50,7 +50,7 @@
 
       const { label, color } = levelMap[levelParam] || levelMap["pre2"];
       header.style.backgroundColor = color;
-      header.querySelector("h1").textContent = `${label} 英検クイズ`;
+      header.querySelector("h1").textContent = `単語 ${label} ${year}年 ${times}回`;
 
       backLink.href = `../year_times.html?level=${levelParam}&field=${fieldParam}`;
 
