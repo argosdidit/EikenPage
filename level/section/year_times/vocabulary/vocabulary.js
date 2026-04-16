@@ -6,6 +6,10 @@
     quizData = [],
     levelParam,
     fieldParam,
+
+    year,
+    times,
+
     func,
     active;
 
