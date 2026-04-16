@@ -6,6 +6,10 @@
   let levelParam, fieldParam;
   let container;
 
+  let
+  year,
+  times;
+
   const conf = {
     container: "reading-container",
     header: "header",
@@ -24,8 +28,8 @@
     async loadReadingData() {
       const urlParams = new URLSearchParams(window.location.search);
       const level = urlParams.get("level");
-      const year = urlParams.get("year");
-      const times = urlParams.get("times");
+      year = urlParams.get("year");
+      times = urlParams.get("times");
 
       const res = await fetch(`/api/reading?level=${level}&year=${year}&times=${times}`);
       const data = await res.json();
