@@ -23,15 +23,6 @@ READING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/ye
 let LISTENING_SOURCE_BASE_URL;
 LISTENING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/listening/";
 
-
-// 文章データ（sentence）の prefix 付与
-function addVocabularyPrefix(row) {
-  return {
-    ...row,
-    path_vocabulary: VOCABULARY_SOURCE_BASE_URL + row.path_explanation
-  };
-}
-
 // 文章データ（sentence）の prefix 付与
 function addReadingSentencePrefix(row) {
   return {
@@ -76,7 +67,7 @@ function addListeningChoicePrefix(row) {
 
 
 // 静的ファイル配信（HTML / CSS / JS）
-//app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname)));
 
 
 // -----------------------------
@@ -126,10 +117,10 @@ app.get("/api/vocExplanation", async (req, res) => {
   const { level, year, times } = req.query;
 
   const tableMap = {
-    pre2: "voc_pre2",
-    grade2: "voc_2",
-    pre1: "voc_pre1",
-    grade1: "voc_1"
+    pre2: "voc_explanation_pre2",
+    grade2: "voc_explanation_2",
+    pre1: "voc_explanation_pre1",
+    grade1: "voc_explanation_1"
   };
 
   const tableName = tableMap[level];
@@ -326,10 +317,6 @@ app.get("/api/listening", async (req, res) => {
     res.status(500).json({ error: "DB error" });
   }
 });
-
-// 静的ファイル配信（HTML / CSS / JS）
-app.use(express.static(path.join(__dirname)));
-
 
 // -----------------------------
 // サーバー起動
