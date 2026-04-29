@@ -25,7 +25,7 @@ LISTENING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/
 
 
 // 文章データ（sentence）の prefix 付与
-function addReadingSentencePrefix(row) {
+function addVocabularyPrefix(row) {
   return {
     ...row,
     path_vocabulary: VOCABULARY_SOURCE_BASE_URL + row.path_explanation
@@ -147,7 +147,14 @@ app.get("/api/quizVocabulary", async (req, res) => {
       [year, times]
     );
 
-    res.json(result.rows);
+    // ★ ここで prefix を付ける
+    const vocabularyExplanationWithPrefix = sentenceResult.rows.map(addVocabularyPrefix);
+
+    res.json({
+      explanation: vocabularyExplanationWithPrefix
+    });
+
+    //res.json(result.rows);
   } catch (err) {
     console.error("quizVocabulary error:", err);
     res.status(500).json({ error: "DB error" });
@@ -223,12 +230,12 @@ app.get("/api/reading", async (req, res) => {
     );
 
     // ★ ここで prefix を付ける
-    const sentenceWithPrefix = sentenceResult.rows.map(addReadingSentencePrefix);
-    const choiceWithPrefix = choiceResult.rows.map(addReadingChoicePrefix);
+    const readingSentenceWithPrefix = sentenceResult.rows.map(addReadingSentencePrefix);
+    const readingChoiceWithPrefix = choiceResult.rows.map(addReadingChoicePrefix);
 
     res.json({
-      sentence: sentenceWithPrefix,
-      choice: choiceWithPrefix
+      sentence: readingSentenceWithPrefix,
+      choice: readingChoiceWithPrefix
     });
 
   } catch (err) {
@@ -306,12 +313,12 @@ app.get("/api/listening", async (req, res) => {
     );
 
     // prefix 付与
-    const audioWithPrefix = audioResult.rows.map(addListeningAudioPrefix);
-    const choiceWithPrefix = choiceResult.rows.map(addListeningChoicePrefix);
+    const listeningAudioWithPrefix = audioResult.rows.map(addListeningAudioPrefix);
+    const listeningChoiceWithPrefix = choiceResult.rows.map(addListeningChoicePrefix);
 
     res.json({
-      audio: audioWithPrefix,
-      choice: choiceWithPrefix
+      audio: listeningAudioWithPrefix,
+      choice: listeningChoiceWithPrefix
     });
 
   } catch (err) {
