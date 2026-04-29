@@ -122,7 +122,7 @@ app.get("/api/quizVocabulary", async (req, res) => {
 // -----------------------------
 // /api/vocExplanation エンドポイント
 // -----------------------------
-app.get("/api/quizVocabulary", async (req, res) => {
+app.get("/api/vocExplanation", async (req, res) => {
   const { level, year, times } = req.query;
 
   const tableMap = {
@@ -147,12 +147,12 @@ app.get("/api/quizVocabulary", async (req, res) => {
       [year, times]
     );
 
-    // ★ ここで prefix を付ける
-    const vocabularyExplanationWithPrefix = sentenceResult.rows.map(addVocabularyPrefix);
+    // prefix を付ける
+    const vocabularyExplanationWithPrefix = result.rows.map(row => ({
+      PATH_EXPLANATION: VOCABULARY_SOURCE_BASE_URL + row.path_explanation
+    }));
 
-    res.json({
-      explanation: vocabularyExplanationWithPrefix
-    });
+    res.json(vocabularyExplanationWithPrefix);
 
     //res.json(result.rows);
   } catch (err) {
