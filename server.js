@@ -15,7 +15,7 @@ client.connect();
 
 // GitHub Pages の画像ベースURL
 let VOCABULARY_SOURCE_BASE_URL;
-VOCABULARY_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/vocabulary/";
+VOCABULARY_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/vocabulary/vocExplanation/";
 
 let READING_SOURCE_BASE_URL;
 READING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
