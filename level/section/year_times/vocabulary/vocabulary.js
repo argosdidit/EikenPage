@@ -158,7 +158,7 @@
         pathExplanationUrl = data_pathVocExplanation[0];
 
         // vocExplanation.html にパスを渡す
-        const url = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
+        const url = `vocExplanation/vocExplanation.html?img=${pathExplanationUrl}`;
 
         finalScore.innerHTML =
         `
