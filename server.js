@@ -76,7 +76,7 @@ function addListeningChoicePrefix(row) {
 
 
 // 静的ファイル配信（HTML / CSS / JS）
-app.use(express.static(path.join(__dirname)));
+//app.use(express.static(path.join(__dirname)));
 
 
 // -----------------------------
@@ -326,6 +326,10 @@ app.get("/api/listening", async (req, res) => {
     res.status(500).json({ error: "DB error" });
   }
 });
+
+// 静的ファイル配信（HTML / CSS / JS）
+app.use(express.static(path.join(__dirname)));
+
 
 // -----------------------------
 // サーバー起動
