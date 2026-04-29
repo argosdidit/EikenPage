@@ -4,6 +4,8 @@
   let
     container,
     quizData = [],
+    data_pathVocExplanation,
+    pathExplanationUrl,
     levelParam,
     fieldParam,
 
@@ -37,6 +39,9 @@
 
       const res = await fetch(`/api/quizVocabulary?level=${level}&year=${year}&times=${times}`);
       quizData = await res.json();
+
+      const res_vocExplanation = await fetch(`/api/vocExplanation?level=${level}&year=${year}&times=${times}`);
+      data_pathVocExplanation = await res_vocExplanation.json();
 
       return this;
     },
@@ -85,7 +90,6 @@
 
         container.appendChild(box);
       });
-
       return this;
     },
     enableSelect: function () {
@@ -150,7 +154,20 @@
         });
 
         const finalScore = document.createElement("div");
-        finalScore.innerHTML = `<strong>あなたの得点: ${score} / ${quizData.length}</strong>`;
+
+        pathExplanationUrl = data_pathVocExplanation[0].path_explanation;
+
+        // vocExplanation.html にパスを渡す
+        const url = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
+
+        finalScore.innerHTML =
+        `
+        <strong>あなたの得点: ${score} / ${quizData.length}</strong>
+        <br>
+        <a href="${url}" target="_blank" style="margin-top:10px; display:inline-block;">
+        ▶ 解説へ
+        </a>
+        `;
         finalScore.style.marginTop = "20px";
         resultBox.appendChild(finalScore);
       });
