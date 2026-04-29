@@ -155,7 +155,7 @@
 
         const finalScore = document.createElement("div");
 
-        pathExplanationUrl = "https://github.com/argosdidit/EikenPage/blob/main/level/section/year_times/vocabulary" + data_pathVocExplanation[0].path_explanation;
+        pathExplanationUrl = data_pathVocExplanation[0];
 
         // vocExplanation.html にパスを渡す
         const url = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
