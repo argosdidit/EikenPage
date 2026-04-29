@@ -14,12 +14,23 @@ const client = new Client({
 client.connect();
 
 // GitHub Pages の画像ベースURL
+let VOCABULARY_SOURCE_BASE_URL;
+VOCABULARY_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/vocabulary/";
+
 let READING_SOURCE_BASE_URL;
 READING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/reading/";
 
 let LISTENING_SOURCE_BASE_URL;
 LISTENING_SOURCE_BASE_URL = "https://argosdidit.github.io/EikenDB/level/section/year_times/listening/";
 
+
+// 文章データ（sentence）の prefix 付与
+function addReadingSentencePrefix(row) {
+  return {
+    ...row,
+    path_vocabulary: VOCABULARY_SOURCE_BASE_URL + row.path_explanation
+  };
+}
 
 // 文章データ（sentence）の prefix 付与
 function addReadingSentencePrefix(row) {
@@ -96,6 +107,41 @@ app.get("/api/quizVocabulary", async (req, res) => {
         word4,
         answer
       FROM ${tableName}
+      WHERE year = $1 AND times = $2
+      `,
+      [year, times]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("quizVocabulary error:", err);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// -----------------------------
+// /api/vocExplanation エンドポイント
+// -----------------------------
+app.get("/api/quizVocabulary", async (req, res) => {
+  const { level, year, times } = req.query;
+
+  const tableMap = {
+    pre2: "voc_pre2",
+    grade2: "voc_2",
+    pre1: "voc_pre1",
+    grade1: "voc_1"
+  };
+
+  const tableName = tableMap[level];
+  if (!tableName) return res.status(400).json({ error: "Invalid level" });
+
+  try {
+    const result = await client.query(
+      `
+      SELECT
+      path_explanation
+      FROM
+      ${tableName}
       WHERE year = $1 AND times = $2
       `,
       [year, times]
