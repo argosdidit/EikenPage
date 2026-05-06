@@ -1,0 +1,11 @@
+h1, h2{
+    text-align: center;
+}
+img {
+    width: 800px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 3000px; /* ← scaleY の分だけ余白を追加 */
+    transform: scaleY(1.6);
+    transform-origin: top;
+}
