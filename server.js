@@ -113,7 +113,7 @@ app.get("/api/quizVocabulary", async (req, res) => {
 });
 
 // -----------------------------
-// /api/saveVocResult (PostgreSQL版)
+// /api/saveVocResult (PostgreSQL版, client.query 使用)
 // -----------------------------
 app.post("/api/saveVocResult", async (req, res) => {
   const { account, level, year, times, date, result } = req.body;
@@ -133,12 +133,6 @@ app.post("/api/saveVocResult", async (req, res) => {
   }
 
   try {
-    // PostgreSQL 接続
-    const client = await pool.connect();
-
-    // -----------------------------
-    // 1. INSERT
-    // -----------------------------
     const insertSql = `
       INSERT INTO result_voc (
         account, levelid, year, times, date,
@@ -165,9 +159,6 @@ app.post("/api/saveVocResult", async (req, res) => {
 
     await client.query(insertSql, params);
 
-    // -----------------------------
-    // 2. 古いデータ削除（最新5件だけ残す）
-    // -----------------------------
     const deleteSql = `
       DELETE FROM result_voc
       WHERE account = $1
@@ -190,7 +181,6 @@ app.post("/api/saveVocResult", async (req, res) => {
 
     await client.query(deleteSql, [account, levelId, year, times]);
 
-    client.release();
     res.json({ status: "ok" });
 
   } catch (err) {
@@ -199,8 +189,9 @@ app.post("/api/saveVocResult", async (req, res) => {
   }
 });
 
+
 // -----------------------------
-// /api/getVocResult (PostgreSQL版)
+// /api/getVocResult (PostgreSQL版, client.query 使用)
 // -----------------------------
 app.get("/api/getVocResult", async (req, res) => {
   const { account, level, year, times } = req.query;
@@ -220,8 +211,6 @@ app.get("/api/getVocResult", async (req, res) => {
   }
 
   try {
-    const client = await pool.connect();
-
     const sql = `
       SELECT *
       FROM result_voc
@@ -237,7 +226,6 @@ app.get("/api/getVocResult", async (req, res) => {
       account, levelId, year, times
     ]);
 
-    client.release();
     res.json(result.rows);
 
   } catch (err) {
@@ -245,6 +233,7 @@ app.get("/api/getVocResult", async (req, res) => {
     res.status(500).json({ error: "DB error" });
   }
 });
+
 
 // -----------------------------
 // /api/vocExplanation エンドポイント
