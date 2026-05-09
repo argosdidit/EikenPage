@@ -210,7 +210,7 @@
         <td>${row.times}</td>
         <td>${dateFormatted}</td>
         ${Array.from({ length: questionCount }, (_, i) => {
-          const v = row[`RESULT${i+1}`];
+          const v = row[`result{i+1}`];
           if (v === 0) return `<td style="color:green;">正</td>`;
           if (v === 99) return `<td style="color:blue;">未</td>`;
           if (v === 50) return `<td style="background:#eee; color:#666;">無</td>`;
