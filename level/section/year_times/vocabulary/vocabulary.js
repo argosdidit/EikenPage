@@ -195,12 +195,12 @@
       
       data.forEach(row => {
         const dateFormatted =
-        row.data.slice(0,4) + "/" +
-        row.data.slice(4,6) + "/" +
-        row.data.slice(6,8) + " " +
-        row.data.slice(8,10) + ":" +
-        row.data.slice(10,12) + ":" +
-        row.data.slice(12,14);
+        row.date.slice(0,4) + "/" +
+        row.date.slice(4,6) + "/" +
+        row.date.slice(6,8) + " " +
+        row.date.slice(8,10) + ":" +
+        row.date.slice(10,12) + ":" +
+        row.date.slice(12,14);
         
         html +=
         `
