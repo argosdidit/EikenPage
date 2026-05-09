@@ -65,6 +65,8 @@ function addListeningChoicePrefix(row) {
   };
 }
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // 静的ファイル配信（HTML / CSS / JS）
 app.use(express.static(path.join(__dirname)));
@@ -106,6 +108,140 @@ app.get("/api/quizVocabulary", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("quizVocabulary error:", err);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// -----------------------------
+// /api/saveVocResult (PostgreSQL版)
+// -----------------------------
+app.post("/api/saveVocResult", async (req, res) => {
+  const { account, level, year, times, date, result } = req.body;
+
+  const levelMap = {
+    pre2: 4,
+    grade2: 3,
+    pre1: 2,
+    grade1: 1
+  };
+
+  const levelClean = level.trim().replace(/\r?\n/g, "");
+  const levelId = levelMap[levelClean];
+
+  if (!levelId) {
+    return res.status(400).json({ error: "Invalid level" });
+  }
+
+  try {
+    // PostgreSQL 接続
+    const client = await pool.connect();
+
+    // -----------------------------
+    // 1. INSERT
+    // -----------------------------
+    const insertSql = `
+      INSERT INTO result_voc (
+        account, levelid, year, times, date,
+        result1, result2, result3, result4, result5,
+        result6, result7, result8, result9, result10,
+        result11, result12, result13, result14, result15,
+        result16, result17, result18, result19, result20,
+        result21, result22, result23, result24, result25
+      )
+      VALUES (
+        $1, $2, $3, $4, $5,
+        $6, $7, $8, $9, $10,
+        $11, $12, $13, $14, $15,
+        $16, $17, $18, $19, $20,
+        $21, $22, $23, $24, $25,
+        $26, $27, $28, $29, $30
+      )
+    `;
+
+    const params = [
+      account, levelId, year, times, date,
+      ...result
+    ];
+
+    await client.query(insertSql, params);
+
+    // -----------------------------
+    // 2. 古いデータ削除（最新5件だけ残す）
+    // -----------------------------
+    const deleteSql = `
+      DELETE FROM result_voc
+      WHERE account = $1
+        AND levelid = $2
+        AND year = $3
+        AND times = $4
+        AND date NOT IN (
+          SELECT date FROM (
+            SELECT date
+            FROM result_voc
+            WHERE account = $1
+              AND levelid = $2
+              AND year = $3
+              AND times = $4
+            ORDER BY date DESC
+            LIMIT 5
+          ) AS t
+        )
+    `;
+
+    await client.query(deleteSql, [account, levelId, year, times]);
+
+    client.release();
+    res.json({ status: "ok" });
+
+  } catch (err) {
+    console.error("saveVocResult error:", err);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// -----------------------------
+// /api/getVocResult (PostgreSQL版)
+// -----------------------------
+app.get("/api/getVocResult", async (req, res) => {
+  const { account, level, year, times } = req.query;
+
+  const levelMap = {
+    pre2: 4,
+    grade2: 3,
+    pre1: 2,
+    grade1: 1
+  };
+
+  const levelClean = level.trim().replace(/\r?\n/g, "");
+  const levelId = levelMap[levelClean];
+
+  if (!levelId) {
+    return res.status(400).json({ error: "Invalid level" });
+  }
+
+  try {
+    const client = await pool.connect();
+
+    const sql = `
+      SELECT *
+      FROM result_voc
+      WHERE account = $1
+        AND levelid = $2
+        AND year = $3
+        AND times = $4
+      ORDER BY date DESC
+      LIMIT 5
+    `;
+
+    const result = await client.query(sql, [
+      account, levelId, year, times
+    ]);
+
+    client.release();
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("getVocResult error:", err);
     res.status(500).json({ error: "DB error" });
   }
 });
