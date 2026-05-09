@@ -195,19 +195,19 @@
       
       data.forEach(row => {
         const dateFormatted =
-        row.DATE.slice(0,4) + "/" +
-        row.DATE.slice(4,6) + "/" +
-        row.DATE.slice(6,8) + " " +
-        row.DATE.slice(8,10) + ":" +
-        row.DATE.slice(10,12) + ":" +
-        row.DATE.slice(12,14);
+        row.data.slice(0,4) + "/" +
+        row.data.slice(4,6) + "/" +
+        row.data.slice(6,8) + " " +
+        row.data.slice(8,10) + ":" +
+        row.data.slice(10,12) + ":" +
+        row.data.slice(12,14);
         
         html +=
         `
         <tr>
         <td>${levelParam}</td>
-        <td>${row.YEAR}</td>
-        <td>${row.TIMES}</td>
+        <td>${row.year}</td>
+        <td>${row.times}</td>
         <td>${dateFormatted}</td>
         ${Array.from({ length: questionCount }, (_, i) => {
           const v = row[`RESULT${i+1}`];
