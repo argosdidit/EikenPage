@@ -146,6 +146,43 @@
           }
         });
 
+        container.querySelectorAll(".quiz-box").forEach((box, index) => {
+          const selected = box.querySelector(".option.selected");
+          const correctIndex = quizData[index].answer;
+          const correctWord = quizData[index][`word{correctIndex}`];
+
+          const number = (index + 1).toString().padStart(2, "0");
+
+          // 正規表現はテンプレート外で作る
+          const reg = new RegExp("\\[0*" + number + "\\]");
+          const questionDiv = box.querySelector(".quiz-question");
+
+          questionDiv.innerHTML = questionDiv.innerHTML.replace(
+            reg,
+            `<span style="color:red;">${correctWord}</span>`
+          );
+
+          let result = document.createElement("div");
+          result.textContent = `No.${number} `;
+
+          if (selected) {
+            const userAnswer = Number(selected.dataset.value);
+            if (userAnswer === correctIndex) {
+              selected.classList.add("correct");
+              result.textContent += "正解";
+              result.style.color = "green";
+              score++;
+            } else {
+              selected.classList.add("incorrect");
+              result.textContent += "不正解";
+              result.style.color = "red";
+            }
+          } else {
+            result.textContent += "未回答";
+            result.style.color = "blue";
+          }
+        });
+
         // ★ ここで 25 個に揃える
         while (resultArray.length < 25) {
           resultArray.push(50);
