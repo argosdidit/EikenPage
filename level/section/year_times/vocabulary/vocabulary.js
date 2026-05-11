@@ -267,6 +267,9 @@
           return `<td style="color:red;">${v}</td>`;
         }).join("")}
         </tr>
+        <a href="${url}" target="_blank" style="margin-top:10px; display:inline-block;">
+        ▶ 解説へ
+        </a>
         `;
       });
       html += "</table>";
