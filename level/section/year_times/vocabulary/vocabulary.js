@@ -230,7 +230,7 @@
 
       const questionCount = quizData.length; // ← ここが超重要
 
-      pathExplanationUrl = data_pathVocExplanation[0].path_explanation;
+      pathExplanationUrl = data_pathVocExplanation[0].PATH_EXPLANATION;
       // vocExplanation.html にパスを渡す
       const url_explanation = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
 
