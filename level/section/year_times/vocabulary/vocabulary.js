@@ -230,6 +230,10 @@
 
       const questionCount = quizData.length; // ← ここが超重要
 
+      pathExplanationUrl = data_pathVocExplanation[0].path_explanation;
+      // vocExplanation.html にパスを渡す
+      const url_explanation = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
+
       let html =
       `
       <h3>${displayAccount} さんの履歴</h3>
@@ -267,7 +271,7 @@
           return `<td style="color:red;">${v}</td>`;
         }).join("")}
         </tr>
-        <a href="${url}" target="_blank" style="margin-top:10px; display:inline-block;">
+        <a href="${url_explanation}" target="_blank" style="margin-top:10px; display:inline-block;">
         ▶ 解説へ
         </a>
         `;
