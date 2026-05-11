@@ -236,6 +236,9 @@
 
       let html =
       `
+      <a href="${url_explanation}" target="_blank" style="margin-top:10px; display:inline-block;">
+      ▶ 解説へ
+      </a>
       <h3>${displayAccount} さんの履歴</h3>
       <table border="1" style="border-collapse: collapse; margin-top:20px;">
       <tr>
@@ -271,9 +274,6 @@
           return `<td style="color:red;">${v}</td>`;
         }).join("")}
         </tr>
-        <a href="${url_explanation}" target="_blank" style="margin-top:10px; display:inline-block;">
-        ▶ 解説へ
-        </a>
         `;
       });
       html += "</table>";
