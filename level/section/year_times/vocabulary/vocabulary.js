@@ -112,6 +112,7 @@
       const button = document.getElementById(conf.checkButton);
       
       button.addEventListener("click", async () => {
+        button.disabled = true;
         let resultArray = [];
         let score = 0;
         
