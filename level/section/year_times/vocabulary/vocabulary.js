@@ -2,6 +2,8 @@
   'use strict';
 
   let
+  getAccountId,
+  getAccountName,
     container,
     quizData = [],
     data_pathVocExplanation,
@@ -28,9 +30,17 @@
   func = {
     init: function () {
       const urlParams = new URLSearchParams(window.location.search);
+      getAccountId = urlParams.get("id");
+      getAccountName = urlParams.get("name");
+
+      if(getAccountId === null)
+        getAccountId = "0000000000";
+
+      if(getAccountName === null)
+        getAccountName = "Guest";
       levelParam = urlParams.get("level") || "pre2";
       fieldParam = urlParams.get("field") || "vocabulary";
-      displayAccount = "namename";
+      displayAccount = getAccountName;
 
       return this;
     },
@@ -50,26 +60,41 @@
       return this;
     },
 
-    setupHeader: function () {
+    makeTitleField: function () {
       const header = document.getElementById(conf.header);
-      const backLink = document.getElementById(conf.backLink);
-
       const levelMap = {
         grade1: { label: "1級", color: "#ffcccc" },
         pre1:   { label: "準1級", color: "#e6ccff" },
         grade2: { label: "2級", color: "#cce6ff" },
         pre2:   { label: "準2級", color: "#fff7cc" }
       };
-
       const { label, color } = levelMap[levelParam] || levelMap["pre2"];
+      header.innerHTML =
+      `
+      <header class="header">
+      <h1>ワード ${label} ${year}年 ${times}回</h1>
+      <div class="header-row">
+      <!-- 左カラム -->
+      <div class="left-group">
+      <a href="../year_times.html?level=${levelParam}&field=${fieldParam}" class="BtnBack">← 戻る</a>
+      <a href="../../../../login.html?id=${getAccountId}&name=${getAccountName}" class="BtnLogout">ログアウト</a>
+      </div>
+      <!-- 中央カラム（★アイコン） -->
+      <div class="center-group">
+      <img id="page-icon" class="page-icon" src="" alt="page icon">
+      </div>
+      <!-- 右カラム -->
+      <div class="right-group">
+      <p>ID: ${getAccountId}</p>
+      <p>${getAccountName}さん</p>
+      </div>
+      </div>
+      </header>
+      `;
+      header.className = "header";
       header.style.backgroundColor = color;
-      header.querySelector("h1").textContent = `ワード ${label} ${year}年 ${times}回`;
-
-      backLink.href = `../year_times.html?level=${levelParam}&field=${fieldParam}`;
-
       return this;
     },
-
     renderQuiz: function () {
       container = document.getElementById(conf.container);
 
@@ -113,13 +138,14 @@
       
       button.addEventListener("click", async () => {
         button.disabled = true;
+
         let resultArray = [];
         let score = 0;
         
         // 25問採点
         container.querySelectorAll(".quiz-box").forEach((box, index) => {
           const selected = box.querySelector(".option.selected");
-          const correctIndex = quizData[index].answer;
+          const correctIndex = quizData[index].ANSWER;
           const correctWord = quizData[index][`word${correctIndex}`];
 
           const number = (index + 1).toString().padStart(2, "0");
@@ -148,8 +174,8 @@
 
         container.querySelectorAll(".quiz-box").forEach((box, index) => {
           const selected = box.querySelector(".option.selected");
-          const correctIndex = quizData[index].answer;
-          const correctWord = quizData[index][`word{correctIndex}`];
+          const correctIndex = quizData[index].ANSWER;
+          const correctWord = quizData[index][`word${correctIndex}`];
 
           const number = (index + 1).toString().padStart(2, "0");
 
@@ -202,6 +228,7 @@
         await func.updateResult(resultArray, DATE);
         await func.loadHistory();
       });
+      
       return this;
     },
     updateResult: async function(resultArray, DATE){
@@ -230,15 +257,8 @@
 
       const questionCount = quizData.length; // ← ここが超重要
 
-      pathExplanationUrl = data_pathVocExplanation[0].PATH_EXPLANATION;
-      // vocExplanation.html にパスを渡す
-      const url_explanation = `vocExplanation/vocExplanation.html?img=${encodeURIComponent(pathExplanationUrl)}`;
-
       let html =
       `
-      <a href="${url_explanation}" target="_blank" style="margin-top:10px; display:inline-block;">
-      ▶ 解説へ
-      </a>
       <h3>${displayAccount} さんの履歴</h3>
       <table border="1" style="border-collapse: collapse; margin-top:20px;">
       <tr>
@@ -278,6 +298,34 @@
       });
       html += "</table>";
       historyBox.innerHTML = html;
+    },
+    settingIcon() {
+      const favicon = document.querySelector('#dynamic-favicon');
+      const pageIcon = document.querySelector('#page-icon'); // ← 中央アイコン
+      let iconPath = ""; // 最終的にここに画像パスを入れる
+      switch(levelParam){
+        case "grade1":
+          iconPath = "../../../../PageIcon/Level1_Vocabulary.png";
+          break;
+        case "pre1":
+          iconPath = "../../../../PageIcon/LevelPre1_Vocabulary.png";
+          break;
+        case "grade2":
+          iconPath = "../../../../PageIcon/Level2_Vocabulary.png";
+          break;
+        case "pre2":
+          iconPath = "../../../../PageIcon/LevelPre2_Vocabulary.png";
+          break;
+        default:
+          iconPath = "../../../../PageIcon/EikenTitle.png"; // ← デフォルト
+        break;
+      }
+      // favicon に設定
+      favicon.href = iconPath;
+      // page-icon にも設定
+      if (pageIcon) {
+        pageIcon.src = iconPath;
+      }
     }
   };
 
@@ -287,10 +335,11 @@
       .loadQuiz()
       .then(() => {
         func
-          .setupHeader()
+          .makeTitleField()
           .renderQuiz()
           .enableSelect()
-          .enableCheck();
+          .enableCheck()
+          .settingIcon();
       });
   };
 
